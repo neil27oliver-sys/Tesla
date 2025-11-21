@@ -22,14 +22,14 @@
         }
     </script>
 
-    <img src="assets/images/monogram.png" alt="Monogram" class="fixed top-4 left-4 w-16 h-16 rounded-full shadow-2xl z-50">
-
-    <!-- Secure key input (appears only once) -->
-    <div id="key-box" class="fixed bottom-4 right-4 bg-gray-900 p-6 rounded-xl shadow-2xl border-2 border-purple-600 z-50 max-w-md" style="display:${localStorage.getItem('tesla-key')?'none':'block'}">
-        <p class="text-yellow-400 font-bold mb-3">Enter your xAI API key once:</p>
-        <input type="password" id="key-input" placeholder="xai-..." class="bg-gray-800 text-white px-4 py-2 rounded w-full mb-3">
-        <button onclick="localStorage.setItem('tesla-key',document.getElementById('key-input').value);document.getElementById('key-box').style.display='none';location.reload();" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded">Save & Activate Grok</button>
+    <!-- Key Box -->
+    <div id="key-box" class="fixed bottom-4 right-4 bg-gray-900 p-6 rounded-2xl shadow-2xl border-2 border-purple-600 z-50" style="display: ${localStorage.getItem('tesla-key') ? 'none' : 'block'};">
+        <p class="text-yellow-400 font-bold text-xl mb-4">Enter xAI API Key (once)</p>
+        <input type="password" id="key-input" placeholder="xai-..." class="bg-gray-800 text-white px-4 py-3 rounded w-full mb-4">
+        <button onclick="localStorage.setItem('tesla-key', document.getElementById('key-input').value.trim()); location.reload();" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded">Save & Activate</button>
     </div>
+
+    <img src="assets/images/monogram.png" alt="Monogram" class="fixed top-4 left-4 w-16 h-16 rounded-full shadow-2xl z-50">
 
     <div id="custom-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
         <div class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full border border-teal-500">
@@ -132,19 +132,21 @@
     </div>
 
     <script>
-        // ==================== FIXED CONFIG (safe key + correct model) ====================
-        const getApiKey = () => localStorage.getItem('tesla-key') || '';
+        // ==================== FIXED CONFIGURATION ====================
+        const apiKey = localStorage.getItem('tesla-key') || '';
         const grokApiUrl = "https://api.x.ai/v1/chat/completions"; 
         
         window.showScreen = (screenId, previousScreenId) => {
-            if (speechSynthesis.speaking) speechSynthesis.cancel();
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
             document.querySelectorAll('.screen').forEach(s => s.hidden = true);
             document.getElementById(screenId).hidden = false;
             if (screenId === 'grid-screen') renderGrid();
         };
 
         const ORIGINAL_ANALYSIS_TEXT = '✨ Get Deep Dive Directive';
-        const CLOSE_ANALYSIS_TEXT = '❌ Close Deep Dive';
+        const CLOSE_ANALYSIS_TEXT = '❌ Close Deep Analysis';
         const PLAY_AUDIO_TEXT = '🔊 Read Transmission Aloud';
         const STOP_AUDIO_TEXT = '⏹ Stop Audio';
 
@@ -153,7 +155,10 @@
             p1: 'Wave', p2: 'Star', p3: 'Crown',
             d1: 'Triangle', d2: 'Wave', d3: 'Square'
         };
-        window.currentReadingData = { rawTextForTTS: "", contextForGrok: "" }; 
+        window.currentReadingData = {
+            rawTextForTTS: "",
+            contextForGrok: ""
+        }; 
 
         const symbols = ['Square', 'Spiral', 'Triangle', 'Wave', 'Star', 'Crown'];
         const symbolDisplay = {
@@ -167,9 +172,11 @@
         const getRandomSymbol = () => symbols[Math.floor(Math.random() * symbols.length)];
 
         function showModal(title, message) {
+            const modal = document.getElementById('custom-modal');
+            if (!modal) return;
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
-            document.getElementById('custom-modal').classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
 
         function closeModal() {
@@ -284,8 +291,6 @@
             const uniqueSymbols = new Set(symbolsArr);
             const sum = symbolsArr.reduce((acc, symbol) => acc + symbolDisplay[symbol].value, 0);
 
-
-
             let resonance = "";
             let summary = "";
             const isTriple = uniqueSymbols.size === 1;
@@ -305,18 +310,27 @@
                 if (isTriple && c1 === 'Square') summary = "▣▣▣ **Static Charge:** Intuitive self-containment. You must consciously **break a routine** (e.g., skip the gym, walk a new route) to release blocked energy. Rest is not idleness, but potent recharging.";
                 if (isTriple && c1 === 'Spiral') summary = "◎◎◎ **Emission Overload:** Your mind is buzzing with too many inputs. Focus on a single breathing ritual (In 3, Hold 6, Out 9) to condense this raw creative energy into a useful, stable output.";
                 if (isTriple && c1 === 'Wave') summary = "≋≋≋ **Tsunami of Adaptation:** Your body is asking for extreme flow and surrender. Resist nothing, embrace total change in diet, schedule, or habits. Rapid transformation is possible.";
+                if (isTriple && c1 === 'Triangle') summary = "▲▲▲ **Rigid Structure:** Your body is craving discipline and order. Implement a strict routine for health (e.g., fixed meal times, consistent exercise) to build a strong foundation.";
+                if (isTriple && c1 === 'Star') summary = "★★★ **Prime Insight:** Intuitive clarity is at its peak. Trust your gut instincts for health decisions; this is a time for innovative wellness approaches, like trying new therapies.";
+                if (isTriple && c1 === 'Crown') summary = "👑👑👑 **Fulfillment Peak:** Your body and intuition are in perfect harmony. Maintain this state by celebrating your health achievements and sharing your wellness knowledge with others.";
             } else if (rowName === 'Prosperity') {
                 summary = `Your **Resource Stream** is activated by *${keyMeanings}*. Abundance will be generated through **structured action and disciplined emission**. Your actions must reflect your internal alignment.`;
 
                 if (isTriple && c1 === 'Square') summary = "▣▣▣ **Financial Fortress:** Your resources are locked down and secure. Growth will be slow but guaranteed through stable, traditional investments. **Avoid risk now.**";
                 if (isTriple && c1 === 'Spiral') summary = "◎◎◎ **Vortex of Expansion:** Resources are multiplying rapidly, but you lack focus. Deploy **structural planning** (Square or Triangle) immediately to anchor the flow and prevent dissipation.";
+                if (isTriple && c1 === 'Wave') summary = "≋≋≋ **Flow of Abundance:** Your resources are in constant motion. Adapt to market changes, but set boundaries to avoid dissipation. **Embrace flexible investments.**";
+                if (isTriple && c1 === 'Triangle') summary = "▲▲▲ **Structured Growth:** Prosperity comes through building solid foundations. Focus on long-term projects and collaborations. **Plan meticulously.**";
+                if (isTriple && c1 === 'Star') summary = "★★★ **Prime Opportunity:** Insightful actions will lead to abundance. Trust your intuition for investments or business decisions. **Seek innovative ventures.**";
                 if (isTriple && c1 === 'Crown') summary = "👑👑👑 **Ultimate Wealth:** You have reached the digital root of abundance. A major financial cycle is completing. **Look for an unexpected reward** tied to past goodwill or a long-term investment.";
             } else if (rowName === 'Destiny') {
                 summary = `Your **Path Alignment** is defined by *${keyMeanings}*. This is the nature of your highest potential. The journey requires synthesizing **Structure and Flow** to reach Prime potential.`;
 
-                if (isTriple && c1 === 'Triangle') summary = "▲▲▲ **Pure Blueprint:** Your destiny is rigid and pre-determined by your commitments. Do not deviate. Focus on perfect execution of your current long-term plan.";
+                if (isTriple && c1 === 'Square') summary = "▣▣▣ **Stable Path:** Your destiny is grounded in stability. Build a solid foundation for your life's work. **Avoid big changes.**";
+                if (isTriple && c1 === 'Spiral') summary = "◎◎◎ **Dynamic Journey:** Your path is full of momentum. Embrace creative emission and movement. **Follow your passion.**";
                 if (isTriple && c1 === 'Wave') summary = "≋≋≋ **Uncharted Current:** The path ahead is fully unknown. This is an invitation to be a pioneer; success comes from radical flexibility. **Commit to zero fixed plans.**";
+                if (isTriple && c1 === 'Triangle') summary = "▲▲▲ **Pure Blueprint:** Your destiny is rigid and pre-determined by your commitments. Do not deviate. Focus on perfect execution of your current long-term plan.";
                 if (isTriple && c1 === 'Star') summary = "★★★ **Prime Alignment:** You are currently living your highest purpose. Every step is guided. Look for **three synchronicities** today as confirmation.";
+                if (isTriple && c1 === 'Crown') summary = "👑👑👑 **Apex Achievement:** Your highest self is within reach. Complete your current cycle with grace. **Celebrate fulfillment.**";
             }
 
             return { resonance, summary, sum, c1, c2, c3 };
@@ -398,7 +412,7 @@
                         </div>
                 </div>
             `;
-            
+
             const stripHtml = (text) => text.replace(/<\/?(strong|em)>/g, '');
 
             const rawTextForTTS = [
@@ -427,8 +441,8 @@
             showScreen('prediction-screen', 'grid-screen');
         }
 
+        // ==================== FIXED GROK CALL ====================
         window.getGrokAnalysis = async (readingContext) => {
-            if (!getApiKey()) { showModal("No Key", "Please enter your xAI key in the box (bottom-right)"); return; }
             const analysisOutput = document.getElementById('analysis-output');
             const analysisButton = document.getElementById('analysis-button');
             
@@ -440,21 +454,26 @@
 
             setLoading('analysis-button', true, ORIGINAL_ANALYSIS_TEXT);
 
+            const systemPrompt = "You are the Tesla Oracle's AI Conduit, powered by Grok-4. Synthesize the provided oracle reading into a single, highly compelling, and actionable directive or mantra for the user. Focus on blending the high-level themes (3, 6, 9) with practical action, written in an inspiring, visionary, and slightly esoteric tone. Start the response with: 'Directive: '";
+            const userQuery = `The full oracle reading is: ${readingContext}. Generate the Directive.`;
+            
             const payload = {
                 model: "grok-beta",
                 messages: [
-                    { role: "system", content: "You are the Tesla Oracle's AI Conduit, powered by Grok-4. Synthesize the provided oracle reading into a single, highly compelling, and actionable directive or mantra for the user. Focus on blending the high-level themes (3, 6, 9) with practical action, written in an inspiring, visionary, and slightly esoteric tone. Start the response with: 'Directive: '" },
-                    { role: "user", content: `The full oracle reading is: ${readingContext}. Generate the Directive.` }
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userQuery }
                 ],
                 temperature: 0.8
             };
             
+            let finalError = "Network or CORS Issue: Failed to fetch.";
+
             try {
                 const response = await fetch(grokApiUrl, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${getApiKey()}`
+                        'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify(payload)
                 });
@@ -463,7 +482,7 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    const text = data.choices?.[0]?.message?.content || "No content received from Grok.";
+                    const text = data.choices?.[0]?.message?.content || "No content received from Grok-4.";
                     
                     analysisOutput.innerHTML = `
                         <div class="p-6 bg-gray-900 border-2 border-purple-500 rounded-xl mt-4 shadow-inner">
@@ -473,44 +492,68 @@
                     `;
                     analysisButton.innerHTML = CLOSE_ANALYSIS_TEXT;
                     return;
-                } 
+
+                } else {
+                    const errorDetails = await response.text();
+                    console.error("Grok API Error:", response.status, errorDetails);
+                    if (response.status === 400 || response.status === 401) {
+                        finalError = `Grok API returned status ${response.status}. Check if your **API Key** is correctly entered and has the 'xai-' prefix.`;
+                    } else {
+                        finalError = `Grok API returned status ${response.status}. Check Console for full details (Key, Endpoint, and CORS).`;
+                    }
+                }
+
             } catch (error) {
-                console.error(error);
+                console.error("Grok Fetch Error:", error);
+                finalError = `Network error: ${error.message}`;
             }
 
             setLoading('analysis-button', false, ORIGINAL_ANALYSIS_TEXT);
-            analysisOutput.innerHTML = `<div class="p-4 rounded-xl border border-red-500 bg-red-900/30 mt-4 text-red-300">Transmission Failure: Check your key or internet connection.</div>`;
+            analysisOutput.innerHTML = `<div class="p-4 rounded-xl border border-red-500 bg-red-900/30 mt-4 text-red-300">Transmission Failure: ${finalError}</div>`;
+            showModal("Oracle Error", finalError);
         }
         
+        // ==================== FIXED TTS LOGIC ====================
         window.generateAndPlayAudio = () => {
             const audioButton = document.getElementById('audio-button');
             
             if (!window.currentReadingData || !window.currentReadingData.rawTextForTTS) {
-                showModal("Data Error", "Generate a prediction first.");
+                showModal("Data Error", "Cannot read transmission: The prediction data has not been generated or was lost. Please click 'CALCULATE ORACLE FATE' first.");
                 return;
             }
 
-            if (speechSynthesis.speaking || speechSynthesis.pending) {
+            const rawText = window.currentReadingData.rawTextForTTS;
+
+            if (speechSynthesis.speaking) {
                 speechSynthesis.cancel();
                 audioButton.innerHTML = PLAY_AUDIO_TEXT;
                 return;
             }
 
-            const utter = new SpeechSynthesisUtterance(window.currentReadingData.rawTextForTTS);
+            const utter = new SpeechSynthesisUtterance(rawText);
             utter.lang = 'en-GB'; 
             utter.rate = 0.9;
             
             audioButton.innerHTML = STOP_AUDIO_TEXT;
             
             utter.onend = () => audioButton.innerHTML = PLAY_AUDIO_TEXT;
-            utter.onerror = () => audioButton.innerHTML = PLAY_AUDIO_TEXT;
+
+            utter.onerror = (event) => {
+                console.error("Speech Synthesis Error:", event.error);
+                showModal("TTS Error", `Failed to read aloud: ${event.error}.`);
+                audioButton.innerHTML = PLAY_AUDIO_TEXT;
+            };
 
             speechSynthesis.speak(utter);
         };
 
+        // Fix TTS interrupted on tab switch or close
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden && speechSynthesis.speaking) speechSynthesis.pause();
-            else if (!document.hidden && speechSynthesis.paused) speechSynthesis.resume();
+            if (document.hidden && speechSynthesis.speaking) {
+                speechSynthesis.pause();
+            } else if (!document.hidden && speechSynthesis.paused) {
+                speechSynthesis.resume();
+            }
         });
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -519,5 +562,6 @@
     </script>
 </body>
 </html>
+
 
 
