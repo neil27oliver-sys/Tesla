@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tesla Trigrams Oracle - Gemini Enhanced</title>
-    <!-- FAVICON IMPLEMENTED – EXACT PATH FROM YOUR EXCEL FILE -->
+    <title>Tesla Trigrams Oracle - Grok Enhanced</title>
     <link rel="icon" href="assets/icon/.favicon.ico" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
@@ -22,6 +21,8 @@
             theme: { extend: { fontFamily: { 'serif': ['Playfair Display', 'serif'] } } }
         }
     </script>
+
+    <img src="assets/images/monogram.png" alt="Monogram" class="fixed top-4 left-4 w-16 h-16 rounded-full shadow-2xl z-50">
 
     <div id="custom-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
         <div class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full border border-teal-500">
@@ -70,8 +71,7 @@
         <h2 class="text-3xl text-yellow-400 font-bold mb-8 text-center w-full max-w-md">Cast Your Resonance Grid</h2>
 
         <div id="grid-container" class="space-y-4 w-full max-w-md">
-            <!-- Dynamically populated by renderGrid -->
-        </div>
+            </div>
         
         <div class="flex justify-center mt-10 mb-8 w-full max-w-md">
             <button 
@@ -92,8 +92,7 @@
         </button>
         <h2 class="text-3xl text-yellow-400 font-bold mb-4 text-center w-full max-w-3xl">The Oracle's Transmission</h2>
         <div id="prediction-output" class="max-w-3xl mx-auto p-4 sm:p-6 rounded-xl bg-gray-800 shadow-2xl w-full">
-            <!-- Prediction content goes here -->
-        </div>
+            </div>
     </div>
 
     <div id="manifesto-screen" class="screen bg-gray-900 p-4 pt-16 text-white overflow-y-auto" hidden>
@@ -126,19 +125,19 @@
     </div>
 
     <script>
-        // FIXED showScreen – this makes all buttons work, including CALCULATE ORACLE FATE
+        // ==================== FIXED CONFIGURATION ====================
+        const apiKey = "xai-REPLACE_WITH_YOUR_REAL_KEY"; 
+        const grokApiUrl = "https://api.x.ai/v1/chat/completions"; 
+        
         window.showScreen = (screenId, previousScreenId) => {
-            document.getElementById(previousScreenId).style.display = 'none';
-            document.getElementById(screenId).style.display = 'flex';
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+            document.querySelectorAll('.screen').forEach(s => s.hidden = true);
+            document.getElementById(screenId).hidden = false;
             if (screenId === 'grid-screen') renderGrid();
         };
 
-        const apiKey = ""; // Your API key here or in Vercel env
-
-        const MAX_RETRIES = 3;
-        const STATIC_FIELD_ERROR = "The Oracle's AI encountered a static field. Please re-run the analysis.";
-        const EMPTY_RESPONSE_ERROR = "The Oracle received an empty transmission after processing.";
-        const NETWORK_FAILURE_ERROR = "A persistent network anomaly occurred. Please ensure you are connected and try again.";
         const ORIGINAL_ANALYSIS_TEXT = '✨ Get Deep Dive Directive';
         const CLOSE_ANALYSIS_TEXT = '❌ Close Deep Dive';
         const PLAY_AUDIO_TEXT = '🔊 Read Transmission Aloud';
@@ -149,9 +148,10 @@
             p1: 'Wave', p2: 'Star', p3: 'Crown',
             d1: 'Triangle', d2: 'Wave', d3: 'Square'
         };
-        window.currentReadingData = {}; 
-        window.currentAudio = null; 
-        window.audioContext = null; 
+        window.currentReadingData = {
+            rawTextForTTS: "",
+            contextForGrok: ""
+        }; 
 
         const symbols = ['Square', 'Spiral', 'Triangle', 'Wave', 'Star', 'Crown'];
         const symbolDisplay = {
@@ -167,7 +167,6 @@
         function showModal(title, message) {
             const modal = document.getElementById('custom-modal');
             if (!modal) return;
-            
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
             modal.classList.remove('hidden');
@@ -183,7 +182,6 @@
 
             if (isLoading) {
                 const loadingText = (elementId === 'audio-button') ? 'Transmission in progress...' : 'Analyzing...';
-
                 el.innerHTML = `<div class="flex items-center justify-center space-x-2">
                     <svg class="animate-spin h-5 w-5 ${spinnerClass}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -198,11 +196,9 @@
             }
         }
 
-
         function renderDiceSlot(id) {
             const symbolKey = window.currentSymbols[id];
             const display = symbolDisplay[symbolKey];
-
             return `
                 <div 
                     id="${id}"
@@ -270,7 +266,6 @@
 
             setTimeout(() => {
                 clearInterval(spinInterval);
-                
                 ids.forEach((id, index) => {
                     setTimeout(() => {
                         window.currentSymbols[id] = getRandomSymbol();
@@ -382,21 +377,20 @@
                         <button 
                             id="analysis-button"
                             class="bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-3 px-8 rounded-xl shadow-xl transition-colors active:scale-95"
-                            onclick="getGeminiAnalysis(window.currentReadingData.contextForGemini)"
+                            onclick="getGrokAnalysis(window.currentReadingData.contextForGrok)"
                         >
                             ${ORIGINAL_ANALYSIS_TEXT}
                         </button>
                         <button 
                             id="audio-button"
                             class="bg-teal-600 hover:bg-teal-700 text-white font-extrabold py-3 px-8 rounded-xl shadow-xl transition-colors active:scale-95"
-                            onclick="generateAndPlayAudio(window.currentReadingData.rawTextForTTS)"
+                            onclick="generateAndPlayAudio()"
                         >
                             ${PLAY_AUDIO_TEXT}
                         </button>
                     </div>
                     <div id="analysis-output" class="mt-4">
-                        <!-- AI analysis will appear here -->
-                    </div>
+                        </div>
                 </div>
             `;
             
@@ -410,7 +404,7 @@
                 `Destiny Resonance: ${destinyReading.resonance}. Summary: ${stripHtml(destinyReading.summary)}`
             ].join('. ');
 
-            const contextForGemini = [
+            const contextForGrok = [
                 `Theme: ${stripHtml(finalTheme)}`,
                 `Total Modulo: ${teslaMod}`,
                 `Interpretation: ${stripHtml(finalInterpretation)}`,
@@ -421,16 +415,15 @@
 
             window.currentReadingData = {
                 rawTextForTTS: rawTextForTTS,
-                contextForGemini: contextForGemini
+                contextForGrok: contextForGrok 
             };
-
 
             document.getElementById('prediction-output').innerHTML = outputHTML;
             showScreen('prediction-screen', 'grid-screen');
         }
 
-
-        window.getGeminiAnalysis = async (readingContext) => {
+        // ==================== FIXED GROK CALL ====================
+        window.getGrokAnalysis = async (readingContext) => {
             const analysisOutput = document.getElementById('analysis-output');
             const analysisButton = document.getElementById('analysis-button');
             
@@ -440,271 +433,101 @@
                 return; 
             }
 
-            if (analysisButton.disabled) return; 
-
-            setLoading('analysis-button', true, ORIGINAL_ANALYSIS_TEXT, 'text-white');
-
-            const systemPrompt = "You are the Tesla Oracle's AI Conduit. Synthesize the provided oracle reading into a single, highly compelling, and actionable directive or mantra for the user. Focus on blending the high-level themes (3, 6, 9) with practical action, written in an inspiring, visionary, and slightly esoteric tone. Start the response with: 'Directive: '";
-            const userQuery = `The full oracle reading is: ${readingContext}. Generate the Directive.`;
-            
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-                generationConfig: {
-                    temperature: 0.8,
-                    maxOutputTokens: 2048 
-                }
-            };
-            
-            let text = null;
-            let finalError = null;
-            let result = null;
-            let retry = true;
-            
-            for (let i = 0; i < MAX_RETRIES && retry; i++) {
-                retry = false; 
-
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.ok) {
-                        result = await response.json();
-                        const content = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                        if (content && content.length > 0 && !content.includes(STATIC_FIELD_ERROR)) {
-                            text = content;
-                            break; 
-                        } else if (content && content.includes(STATIC_FIELD_ERROR)) {
-                            finalError = STATIC_FIELD_ERROR;
-                            retry = true;
-                            console.error(`Attempt ${i + 1} failed: Static Field Error. Response:`, result);
-                        } else {
-                            finalError = EMPTY_RESPONSE_ERROR;
-                            retry = true;
-                            console.error(`Attempt ${i + 1} failed: Empty Content. Response:`, result);
-                        }
-                    } else {
-                        finalError = NETWORK_FAILURE_ERROR;
-                        retry = true;
-                        console.error(`Attempt ${i + 1} failed: HTTP Status ${response.status}`);
-                    }
-
-                } catch (error) {
-                    finalError = NETWORK_FAILURE_ERROR;
-                    retry = true;
-                    console.error(`Attempt ${i + 1} failed: Fetch Error.`, error);
-                }
-
-                if (retry && i < MAX_RETRIES - 1) {
-                    const delay = Math.pow(2, i) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
-
-            setLoading('analysis-button', false, ORIGINAL_ANALYSIS_TEXT);
-
-            if (text) {
-                analysisOutput.innerHTML = `
-                    <div class="p-4 rounded-xl border-2 border-purple-500 bg-gray-900 mt-4 shadow-inner">
-                        <p class="text-lg text-purple-400 font-bold mb-2">AI CONDUIT TRANSMISSION</p>
-                        <p class="text-gray-100 whitespace-pre-wrap">${text}</p>
-                    </div>
-                `;
-                analysisButton.innerHTML = CLOSE_ANALYSIS_TEXT;
-            } else {
-                analysisOutput.innerHTML = `
-                    <div class="p-4 rounded-xl border border-red-500 bg-red-900/30 mt-4 text-red-300">
-                        Transmission Failure: ${finalError || "Unknown error during AI processing."}
-                    </div>
-                `;
-                showModal("Oracle Error", finalError || "The Oracle's AI Conduit failed to generate the deep dive directive after multiple attempts.");
-            }
-        }
-
-        function base64ToArrayBuffer(base64) {
-            const binaryString = atob(base64);
-            const len = binaryString.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
-        }
-
-        function writeString(view, offset, string) {
-            for (let i = 0; i < string.length; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i));
-            }
-        }
-
-        function pcmToWav(pcm16, sampleRate) {
-            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
-            const view = new DataView(buffer);
-            const numChannels = 1;
-            const bitsPerSample = 16;
-            const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
-            const blockAlign = numChannels * (bitsPerSample / 8);
-
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + pcm16.length * 2, true);
-            writeString(view, 8, 'WAVE');
-
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, numChannels, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, byteRate, true);
-            view.setUint16(32, blockAlign, true);
-            view.setUint16(34, bitsPerSample, true);
-
-            writeString(view, 36, 'data');
-            view.setUint32(40, pcm16.length * 2, true);
-
-            let offset = 44;
-            for (let i = 0; i < pcm16.length; i++, offset += 2) {
-                view.setInt16(offset, pcm16[i], true);
-            }
-
-            return new Blob([view], { type: 'audio/wav' });
-        }
-
-
-        window.generateAndPlayAudio = async (rawText) => {
-            const audioButton = document.getElementById('audio-button');
-
-            if (window.currentAudio) {
-                window.currentAudio.pause();
-                window.currentAudio = null;
-                audioButton.innerHTML = PLAY_AUDIO_TEXT;
-                setLoading('audio-button', false, PLAY_AUDIO_TEXT);
+            if (!apiKey.startsWith('xai-')) {
+                showModal("API Key Error", "Your key must start with 'xai-'. Replace the placeholder at the top of the script.");
                 return;
             }
 
-            if (audioButton.disabled) return; 
+            if (location.protocol === 'file:') {
+                showModal("CORS Blocked", "You are running from file:// — API calls are blocked. Upload to a real web server (Netlify, Vercel, etc.).");
+                return;
+            }
 
-            setLoading('audio-button', true, PLAY_AUDIO_TEXT, 'text-white');
-
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-            
-            const fullPrompt = `Say in a clear and firm voice: ${rawText}`; 
+            setLoading('analysis-button', true, ORIGINAL_ANALYSIS_TEXT);
 
             const payload = {
-                contents: [{
-                    parts: [{ text: fullPrompt }]
-                }],
-                generationConfig: {
-                    responseModalities: ["AUDIO"],
-                    speechConfig: {
-                        voiceConfig: {
-                            prebuiltVoiceConfig: { voiceName: "Kore" }
-                        }
-                    }
-                },
-                model: "gemini-2.5-flash-preview-tts"
+                model: "grok-beta",        // ← THIS IS THE REAL MODEL NAME
+                messages: [
+                    { role: "system", content: "You are the Tesla Oracle's AI Conduit, powered by Grok. Synthesize the reading into one powerful, actionable directive. Start with 'Directive: '" },
+                    { role: "user", content: `Full reading: ${readingContext}. Generate the Directive.` }
+                ],
+                temperature: 0.8
             };
-
-            let audioData = null;
-            let mimeType = null;
-            let finalError = null;
-            let result = null;
-            let retry = true;
             
-            for (let i = 0; i < MAX_RETRIES && retry; i++) {
-                retry = false;
+            try {
+                const response = await fetch(grokApiUrl, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.ok) {
-                        result = await response.json();
-                        const part = result?.candidates?.[0]?.content?.parts?.[0];
-                        audioData = part?.inlineData?.data;
-                        mimeType = part?.inlineData?.mimeType;
-
-                        if (audioData && mimeType && mimeType.startsWith("audio/L16")) {
-                            break; 
-                        } else {
-                            finalError = EMPTY_RESPONSE_ERROR;
-                            retry = true;
-                            console.error(`Attempt ${i + 1} failed: Invalid TTS Content.`, result);
-                        }
-                    } else {
-                        finalError = NETWORK_FAILURE_ERROR;
-                        retry = true;
-                        console.error(`Attempt ${i + 1} failed: HTTP Status ${response.status}`);
-                    }
-
-                } catch (error) {
-                    finalError = NETWORK_FAILURE_ERROR;
-                    retry = true;
-                    console.error(`Attempt ${i + 1} failed: Fetch Error.`, error);
+                if (!response.ok) {
+                    const err = await response.text();
+                    throw new Error(`Grok API ${response.status}: ${err}`);
                 }
-                
-                if (retry && i < MAX_RETRIES - 1) {
-                    const delay = Math.pow(2, i) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
 
-            if (audioData) {
-                try {
-                    const rateMatch = mimeType.match(/rate=(\d+)/);
-                    const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
-                    
-                    const pcmBuffer = base64ToArrayBuffer(audioData);
-                    const pcm16 = new Int16Array(pcmBuffer);
-                    
-                    const wavBlob = pcmToWav(pcm16, sampleRate);
-                    const audioUrl = URL.createObjectURL(wavBlob);
-                    
-                    const audio = new Audio(audioUrl);
-                    
-                    audio.onplay = () => {
-                        window.currentAudio = audio;
-                        audioButton.innerHTML = STOP_AUDIO_TEXT;
-                        audioButton.disabled = false;
-                    };
-                    
-                    audio.onended = () => {
-                        window.currentAudio = null;
-                        audioButton.innerHTML = PLAY_AUDIO_TEXT;
-                        URL.revokeObjectURL(audioUrl);
-                    };
+                const data = await response.json();
+                const text = data.choices?.[0]?.message?.content || "No response.";
 
-                    audio.play().catch(e => {
-                        console.error("Audio playback failed:", e);
-                        showModal("Playback Error", "Failed to play audio. Your browser may require a user gesture to start playback.");
-                        setLoading('audio-button', false, PLAY_AUDIO_TEXT);
-                    });
+                analysisOutput.innerHTML = `
+                    <div class="p-6 bg-gray-900 border-2 border-purple-500 rounded-xl mt-4 shadow-inner">
+                        <p class="text-lg text-purple-400 font-bold mb-2">GROK CONDUIT DIRECTIVE</p>
+                        <p class="mt-4 text-gray-100 whitespace-pre-wrap">${text}</p>
+                    </div>`;
+                analysisButton.innerHTML = CLOSE_ANALYSIS_TEXT;
 
-                } catch (e) {
-                    console.error("Audio processing failed:", e);
-                    showModal("Audio Error", "The raw audio data could not be processed into a playable format.");
-                    setLoading('audio-button', false, PLAY_AUDIO_TEXT);
-                }
-            } else {
-                showModal("TTS Failure", finalError || "The Oracle failed to generate the audio transmission after multiple attempts.");
-                setLoading('audio-button', false, PLAY_AUDIO_TEXT);
+            } catch (error) {
+                console.error(error);
+                analysisOutput.innerHTML = `<div class="p-4 rounded-xl border border-red-500 bg-red-900/30 mt-4 text-red-300">Transmission Failure: ${error.message}</div>`;
+            } finally {
+                setLoading('analysis-button', false, ORIGINAL_ANALYSIS_TEXT);
             }
         }
+        
+        // ==================== FIXED TTS (no more "interrupted") ====================
+        window.generateAndPlayAudio = () => {
+            const audioButton = document.getElementById('audio-button');
+            
+            if (!window.currentReadingData?.rawTextForTTS) {
+                showModal("Error", "Generate a reading first!");
+                return;
+            }
+
+            if (speechSynthesis.speaking || speechSynthesis.pending) {
+                speechSynthesis.cancel();
+                audioButton.innerHTML = PLAY_AUDIO_TEXT;
+                return;
+            }
+
+            const utter = new SpeechSynthesisUtterance(window.currentReadingData.rawTextForTTS);
+            utter.lang = 'en-GB';
+            utter.rate = 0.9;
+            
+            audioButton.innerHTML = STOP_AUDIO_TEXT;
+            
+            utter.onend = () => audioButton.innerHTML = PLAY_AUDIO_TEXT;
+            utter.onerror = (e) => {
+                console.error(e);
+                showModal("TTS Error", `Failed: ${e.error}`);
+                audioButton.innerHTML = PLAY_AUDIO_TEXT;
+            };
+
+            speechSynthesis.speak(utter);
+        };
+
+        // Prevent "interrupted" when tab is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && speechSynthesis.speaking) speechSynthesis.pause();
+            else if (!document.hidden && speechSynthesis.paused) speechSynthesis.resume();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (!document.getElementById('grid-screen').style.display === 'flex') {
-                renderGrid();
-            }
+            renderGrid();
         });
     </script>
 </body>
 </html>
+
