@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesla Trigrams Oracle - Gemini Enhanced</title>
+    <!-- FAVICON IMPLEMENTED – EXACT PATH FROM YOUR EXCEL FILE -->
+    <link rel="icon" href="assets/icon/.favicon.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Playfair Display', serif; background-color: #111827; }
+        .screen { min-height: 100vh; width: 100%; position: relative; top: 0; left: 0; display: flex; justify-content: flex-start; align-items: center; flex-direction: column; padding: 2rem; box-sizing: border-box; z-index: 10; }
+        .dice-slot { transition: all 0.2s ease-in-out; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.1) inset; }
+        #grid-screen, #prediction-screen, #manifesto-screen { padding-bottom: 5rem; }
+    </style>
+</head>
+<body>
+
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { 'serif': ['Playfair Display', 'serif'] } } }
+        }
+    </script>
+
+    <div id="custom-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full border border-teal-500">
+            <h3 id="modal-title" class="text-xl font-bold text-yellow-400 mb-4"></h3>
+            <p id="modal-message" class="text-gray-300 mb-6"></p>
+            <button onclick="closeModal()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 rounded-lg transition-colors">
+                Close
+            </button>
+        </div>
+    </div>
+    
+    <div id="welcome-screen" 
+        class="screen text-white bg-black bg-cover bg-center justify-center"
+        style="background-image: url('assets/images/tesla.png'); background-attachment: fixed; background-size: cover;"
+    >
+        <div class="bg-black/80 p-8 rounded-2xl shadow-2xl backdrop-blur-sm flex flex-col items-center max-w-sm w-full">
+            <h1 class="text-6xl text-yellow-400 mb-6 font-extrabold tracking-wider">
+                Tesla Trigrams
+            </h1>
+            <button 
+                class="launch-btn text-6xl text-yellow-400 bg-black/50 p-6 rounded-full shadow-2xl transition-transform ring-4 ring-yellow-400 ring-offset-2 ring-offset-black hover:scale-[1.05] active:scale-[0.98]"
+                onclick="showScreen('grid-screen', 'welcome-screen')"
+            >
+                △
+            </button>
+            <p class="mt-2 text-yellow-200 font-semibold">CAST THE COIL</p>
+            <button 
+                class="mt-6 text-teal-400 bg-black/50 py-3 px-8 rounded-lg font-bold shadow-lg hover:bg-black/70 transition-colors border border-teal-400"
+                onclick="showScreen('manifesto-screen', 'welcome-screen')"
+            >
+                ◎ MANIFESTO
+            </button>
+        </div>
+        <p class="absolute bottom-4 text-xs text-gray-500 text-center w-full">
+            Created by Pan and Hermes
+        </p>
+    </div>
+
+    <div id="grid-screen" class="screen bg-gray-900 p-4 pt-16 text-white overflow-y-auto" hidden>
+        <button 
+            class="absolute top-4 right-4 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors z-20"
+            onclick="showScreen('welcome-screen', 'grid-screen')"
+        >
+            Back
+        </button>
+        <h2 class="text-3xl text-yellow-400 font-bold mb-8 text-center w-full max-w-md">Cast Your Resonance Grid</h2>
+
+        <div id="grid-container" class="space-y-4 w-full max-w-md">
+            <!-- Dynamically populated by renderGrid -->
+        </div>
+        
+        <div class="flex justify-center mt-10 mb-8 w-full max-w-md">
+            <button 
+                class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-4 px-12 rounded-xl text-lg shadow-xl transition-colors w-full"
+                onclick="generatePrediction()"
+            >
+                CALCULATE ORACLE FATE
+            </button>
+        </div>
+    </div>
+
+    <div id="prediction-screen" class="screen bg-gray-900 p-4 pt-16 text-white overflow-y-auto" hidden>
+        <button 
+            class="absolute top-4 right-4 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors z-20"
+            onclick="showScreen('grid-screen', 'prediction-screen')"
+        >
+            Back to Grid
+        </button>
+        <h2 class="text-3xl text-yellow-400 font-bold mb-4 text-center w-full max-w-3xl">The Oracle's Transmission</h2>
+        <div id="prediction-output" class="max-w-3xl mx-auto p-4 sm:p-6 rounded-xl bg-gray-800 shadow-2xl w-full">
+            <!-- Prediction content goes here -->
+        </div>
+    </div>
+
+    <div id="manifesto-screen" class="screen bg-gray-900 p-4 pt-16 text-white overflow-y-auto" hidden>
+        <button 
+            class="absolute top-4 right-4 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors z-20"
+            onclick="showScreen('welcome-screen', 'manifesto-screen')"
+        >
+            Back
+        </button>
+        <h2 class="text-3xl text-yellow-400 font-bold mb-8 text-center w-full max-w-3xl">The Tesla Trigrams: Vortex Oracle Blueprint</h2>
+        <div class="max-w-3xl mx-auto p-4 sm:p-6 rounded-xl bg-gray-800 shadow-2xl text-left w-full">
+            <p class="mb-4">Imagine this: Sparks fly when Nikola Tesla's love for the numbers **3, 6, and 9**—the "key to the universe"—meets the ancient structure of divination. This isn't your grandma's stiff oracle; this is a modern tool for the seeker, blending futuristic design with timeless wisdom.</p>
+            
+            <h3 class="text-xl font-bold text-teal-400 border-b border-gray-700 pb-1 mt-6 mb-3">METHODOLOGY: How to Play (Cast the Coil Ritual)</h3>
+            <p class="mb-4">The entire Oracle reading focuses on three critical areas of life, aligned in a 3-row grid: **Vitality, Prosperity, and Destiny.**</p>
+
+            <h4 class="font-semibold text-yellow-300 mt-4">Step 1: Focus and Breathe</h4>
+            <p class="italic text-gray-400">Breathe Tesla-style: Inhale for 3 counts, hold for 6 counts, and exhale for 9 counts. This establishes the digital root loop ($3+6+9 = 18 \rightarrow 9$) of completion.</p>
+
+            <h4 class="font-semibold text-yellow-300 mt-4">The 6 Glyphs of Resonance</h4>
+            <ul class="list-disc list-inside space-y-1 mt-2 ml-4 text-gray-300">
+                <li>▣ **Square:** Balance, Foundation, Stability</li>
+                <li>◎ **Spiral:** Emission, Momentum, Creative Force</li>
+                <li>▲ **Triangle:** Structure, Creation, Legacy</li>
+                <li>≋ **Wave:** Flow, Adaptability, Change</li>
+                <li>★ **Star:** Prime, Potential, Insight</li>
+                <li>👑 **Crown:** Completion, Apex, Fulfillment</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // FIXED showScreen – this makes all buttons work, including CALCULATE ORACLE FATE
+        window.showScreen = (screenId, previousScreenId) => {
+            document.getElementById(previousScreenId).style.display = 'none';
+            document.getElementById(screenId).style.display = 'flex';
+            if (screenId === 'grid-screen') renderGrid();
+        };
+
+        const apiKey = ""; // Your API key here or in Vercel env
+
+        const MAX_RETRIES = 3;
+        const STATIC_FIELD_ERROR = "The Oracle's AI encountered a static field. Please re-run the analysis.";
+        const EMPTY_RESPONSE_ERROR = "The Oracle received an empty transmission after processing.";
+        const NETWORK_FAILURE_ERROR = "A persistent network anomaly occurred. Please ensure you are connected and try again.";
+        const ORIGINAL_ANALYSIS_TEXT = '✨ Get Deep Dive Directive';
+        const CLOSE_ANALYSIS_TEXT = '❌ Close Deep Dive';
+        const PLAY_AUDIO_TEXT = '🔊 Read Transmission Aloud';
+        const STOP_AUDIO_TEXT = '⏹ Stop Audio';
+
+        window.currentSymbols = {
+            v1: 'Star', v2: 'Square', v3: 'Spiral',
+            p1: 'Wave', p2: 'Star', p3: 'Crown',
+            d1: 'Triangle', d2: 'Wave', d3: 'Square'
+        };
+        window.currentReadingData = {}; 
+        window.currentAudio = null; 
+        window.audioContext = null; 
+
+        const symbols = ['Square', 'Spiral', 'Triangle', 'Wave', 'Star', 'Crown'];
+        const symbolDisplay = {
+            'Square': { char: '▣', color: 'text-blue-300', value: 1 },
+            'Spiral': { char: '◎', color: 'text-yellow-400', value: 2 },
+            'Triangle': { char: '▲', color: 'text-green-300', value: 3 },
+            'Wave': { char: '≋', color: 'text-gray-300', value: 4 },
+            'Star': { char: '★', color: 'text-purple-300', value: 5 },
+            'Crown': { char: '👑', color: 'text-pink-300', value: 6 }
+        };
+        const getRandomSymbol = () => symbols[Math.floor(Math.random() * symbols.length)];
+
+        function showModal(title, message) {
+            const modal = document.getElementById('custom-modal');
+            if (!modal) return;
+            
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        function setLoading(elementId, isLoading, defaultText = '', spinnerClass = 'text-yellow-400') {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            if (isLoading) {
+                const loadingText = (elementId === 'audio-button') ? 'Transmission in progress...' : 'Analyzing...';
+
+                el.innerHTML = `<div class="flex items-center justify-center space-x-2">
+                    <svg class="animate-spin h-5 w-5 ${spinnerClass}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>${loadingText}</span>
+                </div>`;
+                el.disabled = true;
+            } else {
+                el.innerHTML = defaultText;
+                el.disabled = false;
+            }
+        }
+
+
+        function renderDiceSlot(id) {
+            const symbolKey = window.currentSymbols[id];
+            const display = symbolDisplay[symbolKey];
+
+            return `
+                <div 
+                    id="${id}"
+                    class="dice-slot flex justify-center items-center w-full aspect-square bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-5xl sm:text-7xl font-extrabold ${display.color}"
+                >
+                    ${display.char}
+                </div>
+            `;
+        }
+
+        function renderRowGroup(rowPrefix, label) {
+            return `
+                <div key="${rowPrefix}" class="flex items-center justify-center mx-auto my-4 w-full max-w-sm p-4 rounded-xl border border-gray-700 bg-gray-900/50 shadow-2xl">
+                    <button 
+                        class="text-yellow-400 text-4xl cursor-pointer mr-4 hover:text-yellow-300 transition-colors"
+                        onclick="spinRow('${rowPrefix}')"
+                    >
+                        △
+                    </button>
+                    <div class="flex-grow">
+                        <div class="text-left text-sm text-gray-400 mb-2 font-semibold">${label}</div>
+                        <div class="grid grid-cols-3 gap-3">
+                            ${renderDiceSlot(rowPrefix + '1')}
+                            ${renderDiceSlot(rowPrefix + '2')}
+                            ${renderDiceSlot(rowPrefix + '3')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGrid() {
+            const gridContainer = document.getElementById('grid-container');
+            if (!gridContainer) return;
+
+            if (!gridContainer.innerHTML || gridContainer.children.length === 0) {
+                gridContainer.innerHTML = [
+                    renderRowGroup('v', '1. Vitality (Body, Intuition, Health)'),
+                    renderRowGroup('p', '2. Prosperity (Abundance, Resources, Action)'),
+                    renderRowGroup('d', '3. Destiny (Path, Potential, Highest Self)')
+                ].join('');
+            } else {
+                Object.keys(window.currentSymbols).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const symbolKey = window.currentSymbols[id];
+                        const display = symbolDisplay[symbolKey];
+                        el.textContent = display.char;
+                        el.className = `dice-slot flex justify-center items-center w-full aspect-square bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-5xl sm:text-7xl font-extrabold ${display.color}`;
+                    }
+                });
+            }
+        }
+
+        window.spinRow = (rowPrefix) => {
+            const ids = [`${rowPrefix}1`, `${rowPrefix}2`, `${rowPrefix}3`];
+            const spinDuration = 1500; 
+
+            const spinInterval = setInterval(() => {
+                ids.forEach(id => {
+                    window.currentSymbols[id] = getRandomSymbol();
+                });
+                renderGrid();
+            }, 100);
+
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                
+                ids.forEach((id, index) => {
+                    setTimeout(() => {
+                        window.currentSymbols[id] = getRandomSymbol();
+                        renderGrid();
+                    }, index * 200); 
+                });
+
+            }, spinDuration);
+        }
+
+        function calculateReading(c1, c2, c3, rowName) {
+            const symbolsArr = [c1, c2, c3];
+            const uniqueSymbols = new Set(symbolsArr);
+            const sum = symbolsArr.reduce((acc, symbol) => acc + symbolDisplay[symbol].value, 0);
+
+            let resonance = "";
+            let summary = "";
+            const isTriple = uniqueSymbols.size === 1;
+            const keyMeanings = symbolsArr.map(s => symbolDisplay[s].value === 6 ? 'Fulfillment' : s).join(', ');
+
+            if (isTriple) {
+                resonance = `Triple ${c1.toUpperCase()} Manifestation`;
+            } else if (uniqueSymbols.size === 3) {
+                resonance = "Synergistic Flux";
+            } else if (uniqueSymbols.size === 2) {
+                resonance = "Paired Polarity";
+            }
+            
+            if (rowName === 'Vitality') {
+                summary = `Your **Intuitive Current** is channeled through a dynamic of *${keyMeanings}*. This is a call to align mind and body, finding health not in rigidity, but in **adaptive, energized flow**.`;
+                
+                if (isTriple && c1 === 'Square') summary = "▣▣▣ **Static Charge:** Intuitive self-containment. You must consciously **break a routine** (e.g., skip the gym, walk a new route) to release blocked energy. Rest is not idleness, but potent recharging.";
+                if (isTriple && c1 === 'Spiral') summary = "◎◎◎ **Emission Overload:** Your mind is buzzing with too many inputs. Focus on a single breathing ritual (In 3, Hold 6, Out 9) to condense this raw creative energy into a useful, stable output.";
+                if (isTriple && c1 === 'Wave') summary = "≋≋≋ **Tsunami of Adaptation:** Your body is asking for extreme flow and surrender. Resist nothing, embrace total change in diet, schedule, or habits. Rapid transformation is possible.";
+            } else if (rowName === 'Prosperity') {
+                summary = `Your **Resource Stream** is activated by *${keyMeanings}*. Abundance will be generated through **structured action and disciplined emission**. Your actions must reflect your internal alignment.`;
+
+                if (isTriple && c1 === 'Square') summary = "▣▣▣ **Financial Fortress:** Your resources are locked down and secure. Growth will be slow but guaranteed through stable, traditional investments. **Avoid risk now.**";
+                if (isTriple && c1 === 'Spiral') summary = "◎◎◎ **Vortex of Expansion:** Resources are multiplying rapidly, but you lack focus. Deploy **structural planning** (Square or Triangle) immediately to anchor the flow and prevent dissipation.";
+                if (isTriple && c1 === 'Crown') summary = "👑👑👑 **Ultimate Wealth:** You have reached the digital root of abundance. A major financial cycle is completing. **Look for an unexpected reward** tied to past goodwill or a long-term investment.";
+            } else if (rowName === 'Destiny') {
+                summary = `Your **Path Alignment** is defined by *${keyMeanings}*. This is the nature of your highest potential. The journey requires synthesizing **Structure and Flow** to reach Prime potential.`;
+
+                if (isTriple && c1 === 'Triangle') summary = "▲▲▲ **Pure Blueprint:** Your destiny is rigid and pre-determined by your commitments. Do not deviate. Focus on perfect execution of your current long-term plan.";
+                if (isTriple && c1 === 'Wave') summary = "≋≋≋ **Uncharted Current:** The path ahead is fully unknown. This is an invitation to be a pioneer; success comes from radical flexibility. **Commit to zero fixed plans.**";
+                if (isTriple && c1 === 'Star') summary = "★★★ **Prime Alignment:** You are currently living your highest purpose. Every step is guided. Look for **three synchronicities** today as confirmation.";
+            }
+
+            return { resonance, summary, sum, c1, c2, c3 };
+        }
+
+        window.generatePrediction = () => {
+            const { v1, v2, v3, p1, p2, p3, d1, d2, d3 } = window.currentSymbols;
+
+            const vitalityReading = calculateReading(v1, v2, v3, 'Vitality');
+            const prosperityReading = calculateReading(p1, p2, p3, 'Prosperity');
+            const destinyReading = calculateReading(d1, d2, d3, 'Destiny');
+
+            const totalSum = vitalityReading.sum + prosperityReading.sum + destinyReading.sum;
+            const teslaMod = totalSum % 9; 
+            
+            let finalTheme = "";
+            let finalInterpretation = "";
+
+            if (teslaMod === 3) {
+                finalTheme = "The Principle of **CREATION** (3)";
+                finalInterpretation = "The energy of the Coil calls for immediate construction. Focus your combined Vitality, Prosperity, and Destiny towards initiating a new phase, project, or relationship. This is the time to generate, not merely maintain. **You are the spark.**";
+            } else if (teslaMod === 6) {
+                finalTheme = "The Principle of **RESONANCE** (6)";
+                finalInterpretation = "Your current path is vibrating with the universal frequency. Review your external relationships and internal environments; harmony is the key. Seek alignment between your actions and your highest values to amplify your potential. **Amplify the good.**";
+            } else if (teslaMod === 0 || teslaMod === 9) {
+                finalTheme = "The Principle of **HARMONY** (9)";
+                finalInterpretation = "This result signifies a cycle of completion and mastery. All three forces—Body, Resource, and Path—are in perfect balance. You have the necessary foundation and flow to achieve a significant, long-term goal. Move with quiet confidence. **Enjoy the mastery.**";
+            } else {
+                finalTheme = `The Principle of **FLUX** (Modulus: ${teslaMod})`;
+                finalInterpretation = "Your current state is dynamic and requires focused energy management. The total resonance does not fall into the primary 3-6-9 loop, indicating a period of high change and rapid learning. Focus on synthesizing your three forces to achieve stability. **Adapt to grow.**";
+            }
+
+            const formatSummary = (summary) => {
+                return summary
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            };
+
+            const readingComponents = [
+                { title: 'VITALITY (Body, Health, Intuition)', data: vitalityReading },
+                { title: 'PROSPERITY (Abundance, Resources, Action)', data: prosperityReading },
+                { title: 'DESTINY (Path, Potential, Highest Self)', data: destinyReading },
+            ];
+
+            const outputHTML = `
+                <div class="p-4 sm:p-6 w-full">
+                    <p class="text-xl text-center font-bold text-gray-400 mb-2">THE FULL ORACLE TRANSMISSION</p>
+                    <p class="text-center text-3xl font-extrabold text-teal-400 mb-6">${finalTheme}</p>
+                    
+                    <h3 class="text-xl font-bold text-yellow-400 border-b border-yellow-800 pb-1 mt-6 mb-3">THE HARMONIC LAW</h3>
+                    <p class="mb-4 text-gray-200">${formatSummary(finalInterpretation)}</p>
+
+                    ${readingComponents.map((item, index) => `
+                        <div key=${index} class="mb-6">
+                            <h3 class="text-xl font-bold text-yellow-400 border-b border-yellow-800 pb-1 mt-6 mb-3">${item.title}</h3>
+                            <p class="font-semibold text-lg text-teal-300">Resonance: ${item.data.resonance}</p>
+                            <p class="text-gray-200">${formatSummary(item.data.summary)}</p>
+                            <p class="text-xs text-gray-500 mt-2">Trigram: ${item.data.c1}-${item.data.c2}-${item.data.c3} (Sum: ${item.data.sum})</p>
+                        </div>
+                    `).join('')}
+
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button 
+                            id="analysis-button"
+                            class="bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-3 px-8 rounded-xl shadow-xl transition-colors active:scale-95"
+                            onclick="getGeminiAnalysis(window.currentReadingData.contextForGemini)"
+                        >
+                            ${ORIGINAL_ANALYSIS_TEXT}
+                        </button>
+                        <button 
+                            id="audio-button"
+                            class="bg-teal-600 hover:bg-teal-700 text-white font-extrabold py-3 px-8 rounded-xl shadow-xl transition-colors active:scale-95"
+                            onclick="generateAndPlayAudio(window.currentReadingData.rawTextForTTS)"
+                        >
+                            ${PLAY_AUDIO_TEXT}
+                        </button>
+                    </div>
+                    <div id="analysis-output" class="mt-4">
+                        <!-- AI analysis will appear here -->
+                    </div>
+                </div>
+            `;
+            
+            const stripHtml = (text) => text.replace(/<\/?(strong|em)>/g, '');
+
+            const rawTextForTTS = [
+                stripHtml(finalTheme),
+                stripHtml(finalInterpretation),
+                `Vitality Resonance: ${vitalityReading.resonance}. Summary: ${stripHtml(vitalityReading.summary)}`,
+                `Prosperity Resonance: ${prosperityReading.resonance}. Summary: ${stripHtml(prosperityReading.summary)}`,
+                `Destiny Resonance: ${destinyReading.resonance}. Summary: ${stripHtml(destinyReading.summary)}`
+            ].join('. ');
+
+            const contextForGemini = [
+                `Theme: ${stripHtml(finalTheme)}`,
+                `Total Modulo: ${teslaMod}`,
+                `Interpretation: ${stripHtml(finalInterpretation)}`,
+                `Vitality: ${v1}-${v2}-${v3} (${vitalityReading.resonance})`,
+                `Prosperity: ${p1}-${p2}-${p3} (${prosperityReading.resonance})`,
+                `Destiny: ${d1}-${d2}-${d3} (${destinyReading.resonance})`
+            ].join(' | ');
+
+            window.currentReadingData = {
+                rawTextForTTS: rawTextForTTS,
+                contextForGemini: contextForGemini
+            };
+
+
+            document.getElementById('prediction-output').innerHTML = outputHTML;
+            showScreen('prediction-screen', 'grid-screen');
+        }
+
+
+        window.getGeminiAnalysis = async (readingContext) => {
+            const analysisOutput = document.getElementById('analysis-output');
+            const analysisButton = document.getElementById('analysis-button');
+            
+            if (analysisOutput.innerHTML.trim() !== '') {
+                analysisOutput.innerHTML = '';
+                analysisButton.innerHTML = ORIGINAL_ANALYSIS_TEXT;
+                return; 
+            }
+
+            if (analysisButton.disabled) return; 
+
+            setLoading('analysis-button', true, ORIGINAL_ANALYSIS_TEXT, 'text-white');
+
+            const systemPrompt = "You are the Tesla Oracle's AI Conduit. Synthesize the provided oracle reading into a single, highly compelling, and actionable directive or mantra for the user. Focus on blending the high-level themes (3, 6, 9) with practical action, written in an inspiring, visionary, and slightly esoteric tone. Start the response with: 'Directive: '";
+            const userQuery = `The full oracle reading is: ${readingContext}. Generate the Directive.`;
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    temperature: 0.8,
+                    maxOutputTokens: 2048 
+                }
+            };
+            
+            let text = null;
+            let finalError = null;
+            let result = null;
+            let retry = true;
+            
+            for (let i = 0; i < MAX_RETRIES && retry; i++) {
+                retry = false; 
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        result = await response.json();
+                        const content = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                        if (content && content.length > 0 && !content.includes(STATIC_FIELD_ERROR)) {
+                            text = content;
+                            break; 
+                        } else if (content && content.includes(STATIC_FIELD_ERROR)) {
+                            finalError = STATIC_FIELD_ERROR;
+                            retry = true;
+                            console.error(`Attempt ${i + 1} failed: Static Field Error. Response:`, result);
+                        } else {
+                            finalError = EMPTY_RESPONSE_ERROR;
+                            retry = true;
+                            console.error(`Attempt ${i + 1} failed: Empty Content. Response:`, result);
+                        }
+                    } else {
+                        finalError = NETWORK_FAILURE_ERROR;
+                        retry = true;
+                        console.error(`Attempt ${i + 1} failed: HTTP Status ${response.status}`);
+                    }
+
+                } catch (error) {
+                    finalError = NETWORK_FAILURE_ERROR;
+                    retry = true;
+                    console.error(`Attempt ${i + 1} failed: Fetch Error.`, error);
+                }
+
+                if (retry && i < MAX_RETRIES - 1) {
+                    const delay = Math.pow(2, i) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            setLoading('analysis-button', false, ORIGINAL_ANALYSIS_TEXT);
+
+            if (text) {
+                analysisOutput.innerHTML = `
+                    <div class="p-4 rounded-xl border-2 border-purple-500 bg-gray-900 mt-4 shadow-inner">
+                        <p class="text-lg text-purple-400 font-bold mb-2">AI CONDUIT TRANSMISSION</p>
+                        <p class="text-gray-100 whitespace-pre-wrap">${text}</p>
+                    </div>
+                `;
+                analysisButton.innerHTML = CLOSE_ANALYSIS_TEXT;
+            } else {
+                analysisOutput.innerHTML = `
+                    <div class="p-4 rounded-xl border border-red-500 bg-red-900/30 mt-4 text-red-300">
+                        Transmission Failure: ${finalError || "Unknown error during AI processing."}
+                    </div>
+                `;
+                showModal("Oracle Error", finalError || "The Oracle's AI Conduit failed to generate the deep dive directive after multiple attempts.");
+            }
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        function pcmToWav(pcm16, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcm16.length * 2);
+            const view = new DataView(buffer);
+            const numChannels = 1;
+            const bitsPerSample = 16;
+            const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+            const blockAlign = numChannels * (bitsPerSample / 8);
+
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcm16.length * 2, true);
+            writeString(view, 8, 'WAVE');
+
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitsPerSample, true);
+
+            writeString(view, 36, 'data');
+            view.setUint32(40, pcm16.length * 2, true);
+
+            let offset = 44;
+            for (let i = 0; i < pcm16.length; i++, offset += 2) {
+                view.setInt16(offset, pcm16[i], true);
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+
+        window.generateAndPlayAudio = async (rawText) => {
+            const audioButton = document.getElementById('audio-button');
+
+            if (window.currentAudio) {
+                window.currentAudio.pause();
+                window.currentAudio = null;
+                audioButton.innerHTML = PLAY_AUDIO_TEXT;
+                setLoading('audio-button', false, PLAY_AUDIO_TEXT);
+                return;
+            }
+
+            if (audioButton.disabled) return; 
+
+            setLoading('audio-button', true, PLAY_AUDIO_TEXT, 'text-white');
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+            
+            const fullPrompt = `Say in a clear and firm voice: ${rawText}`; 
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: fullPrompt }]
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: { voiceName: "Kore" }
+                        }
+                    }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+            };
+
+            let audioData = null;
+            let mimeType = null;
+            let finalError = null;
+            let result = null;
+            let retry = true;
+            
+            for (let i = 0; i < MAX_RETRIES && retry; i++) {
+                retry = false;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        result = await response.json();
+                        const part = result?.candidates?.[0]?.content?.parts?.[0];
+                        audioData = part?.inlineData?.data;
+                        mimeType = part?.inlineData?.mimeType;
+
+                        if (audioData && mimeType && mimeType.startsWith("audio/L16")) {
+                            break; 
+                        } else {
+                            finalError = EMPTY_RESPONSE_ERROR;
+                            retry = true;
+                            console.error(`Attempt ${i + 1} failed: Invalid TTS Content.`, result);
+                        }
+                    } else {
+                        finalError = NETWORK_FAILURE_ERROR;
+                        retry = true;
+                        console.error(`Attempt ${i + 1} failed: HTTP Status ${response.status}`);
+                    }
+
+                } catch (error) {
+                    finalError = NETWORK_FAILURE_ERROR;
+                    retry = true;
+                    console.error(`Attempt ${i + 1} failed: Fetch Error.`, error);
+                }
+                
+                if (retry && i < MAX_RETRIES - 1) {
+                    const delay = Math.pow(2, i) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            if (audioData) {
+                try {
+                    const rateMatch = mimeType.match(/rate=(\d+)/);
+                    const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
+                    
+                    const pcmBuffer = base64ToArrayBuffer(audioData);
+                    const pcm16 = new Int16Array(pcmBuffer);
+                    
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    
+                    const audio = new Audio(audioUrl);
+                    
+                    audio.onplay = () => {
+                        window.currentAudio = audio;
+                        audioButton.innerHTML = STOP_AUDIO_TEXT;
+                        audioButton.disabled = false;
+                    };
+                    
+                    audio.onended = () => {
+                        window.currentAudio = null;
+                        audioButton.innerHTML = PLAY_AUDIO_TEXT;
+                        URL.revokeObjectURL(audioUrl);
+                    };
+
+                    audio.play().catch(e => {
+                        console.error("Audio playback failed:", e);
+                        showModal("Playback Error", "Failed to play audio. Your browser may require a user gesture to start playback.");
+                        setLoading('audio-button', false, PLAY_AUDIO_TEXT);
+                    });
+
+                } catch (e) {
+                    console.error("Audio processing failed:", e);
+                    showModal("Audio Error", "The raw audio data could not be processed into a playable format.");
+                    setLoading('audio-button', false, PLAY_AUDIO_TEXT);
+                }
+            } else {
+                showModal("TTS Failure", finalError || "The Oracle failed to generate the audio transmission after multiple attempts.");
+                setLoading('audio-button', false, PLAY_AUDIO_TEXT);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!document.getElementById('grid-screen').style.display === 'flex') {
+                renderGrid();
+            }
+        });
+    </script>
+</body>
+</html>
