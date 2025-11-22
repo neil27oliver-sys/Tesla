@@ -511,53 +511,27 @@
         };
         
         // ==================== FIXED TTS ====================
-        window.generateAndPlayAudio = () => {
-            const audioButton = document.getElementById('audio-button');
-            
-            if (!window.currentReadingData || !window.currentReadingData.rawTextForTTS) {
-                showModal("Data Error", "Generate a prediction first.");
-                return;
-            }
-
+         window.generateAndPlayAudio = () => {
             if (speechSynthesis.speaking) {
                 speechSynthesis.cancel();
-                audioButton.innerHTML = PLAY_AUDIO_TEXT;
+                document.getElementById('audio-button').innerHTML = PLAY_AUDIO_TEXT;
                 return;
             }
-
             const utter = new SpeechSynthesisUtterance(window.currentReadingData.rawTextForTTS);
-            utter.lang = 'en-GB'; 
+            utter.lang = 'en-GB';
             utter.rate = 0.9;
-            
-            audioButton.innerHTML = STOP_AUDIO_TEXT;
-            
-            utter.onend = () => audioButton.innerHTML = PLAY_AUDIO_TEXT;
-
-            utter.onerror = (event) => {
-                console.error("TTS Error:", event.error);
-                showModal("TTS Error", `Failed: ${event.error}`);
-                audioButton.innerHTML = PLAY_AUDIO_TEXT;
-            };
-
+            document.getElementById('audio-button').innerHTML = STOP_AUDIO_TEXT;
+            utter.onend = () => document.getElementById('audio-button').innerHTML = PLAY_AUDIO_TEXT;
             speechSynthesis.speak(utter);
         };
 
-        // Handle tab switch for TTS
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && speechSynthesis.speaking) {
-                speechSynthesis.pause();
-            } else if (!document.hidden && speechSynthesis.paused) {
-                speechSynthesis.resume();
-            }
-        });
-
-        // Init
         document.addEventListener('DOMContentLoaded', () => {
             renderGrid();
         });
     </script>
 </body>
 </html>
+
 
 
 
