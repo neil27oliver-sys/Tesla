@@ -24,7 +24,7 @@
 
     <img src="assets/images/monogram.png" alt="Monogram" class="fixed top-4 left-4 w-16 h-16 rounded-full shadow-2xl z-50">
 
-    <div id="key-box" class="fixed bottom-4 right-4 bg-gray-900 p-6 rounded-xl shadow-2xl border-2 border-purple-600 z-50 max-w-sm" style="display: ${localStorage.getItem('tesla-key') ? 'none' : 'block'};">
+    <div id="keybox" class="fixed bottom-4 right-4 ... hidden" style="display: ${localStorage.getItem('tesla_grok_key') ? 'none' : 'block'}">
         <h3 class="text-yellow-400 font-bold mb-4">Enter xAI API Key (once)</h3>
         <input type="password" id="key-input" placeholder="xai-..." class="bg-gray-800 text-white px-3 py-2 rounded w-full mb-4">
         <button onclick="saveKey()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded">Save & Activate</button>
@@ -531,6 +531,7 @@
     </script>
 </body>
 </html>
+
 
 
 
