@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesla Trigrams Oracle - Grok Enhanced</title>
-    <link rel="icon" type="image/x-icon" href="/assets/icon/favicon.ico">
+   <link rel="icon" type="image/x-icon" href="/assets/icon/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -24,6 +24,7 @@
 
     <img src="assets/images/monogram.png" alt="Monogram" class="fixed top-4 left-4 w-16 h-16 rounded-full shadow-2xl z-50">
 
+    
     <div id="custom-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
         <div class="bg-gray-800 p-6 rounded-xl shadow-2xl max-w-sm w-full border border-teal-500">
             <h3 id="modal-title" class="text-xl font-bold text-yellow-400 mb-4"></h3>
@@ -71,7 +72,7 @@
         <h2 class="text-3xl text-yellow-400 font-bold mb-8 text-center w-full max-w-md">Cast Your Resonance Grid</h2>
 
         <div id="grid-container" class="space-y-4 w-full max-w-md">
-        </div>
+            </div>
         
         <div class="flex justify-center mt-10 mb-8 w-full max-w-md">
             <button 
@@ -92,7 +93,7 @@
         </button>
         <h2 class="text-3xl text-yellow-400 font-bold mb-4 text-center w-full max-w-3xl">The Oracle's Transmission</h2>
         <div id="prediction-output" class="max-w-3xl mx-auto p-4 sm:p-6 rounded-xl bg-gray-800 shadow-2xl w-full">
-        </div>
+            </div>
     </div>
 
     <div id="manifesto-screen" class="screen bg-gray-900 p-4 pt-16 text-white overflow-y-auto" hidden>
@@ -104,48 +105,51 @@
         </button>
         <h2 class="text-3xl text-yellow-400 font-bold mb-8 text-center w-full max-w-3xl">The Tesla Trigrams: Vortex Oracle Blueprint</h2>
         <div class="max-w-3xl mx-auto p-4 sm:p-6 rounded-xl bg-gray-800 shadow-2xl text-left w-full">
-            <p class="mb-4">Imagine this: Sparks fly when Nikola Tesla's love for the numbers <strong>3, 6, and 9</strong>—the "key to the universe"—meets the ancient structure of divination. This isn't your grandma's stiff oracle; this is a modern tool for the seeker, blending futuristic design with timeless wisdom.</p>
+            <p class="mb-4">Imagine this: Sparks fly when Nikola Tesla's love for the numbers **3, 6, and 9**—the "key to the universe"—meets the ancient structure of divination. This isn't your grandma's stiff oracle; this is a modern tool for the seeker, blending futuristic design with timeless wisdom.</p>
             
             <h3 class="text-xl font-bold text-teal-400 border-b border-gray-700 pb-1 mt-6 mb-3">METHODOLOGY: How to Play (Cast the Coil Ritual)</h3>
-            <p class="mb-4">The entire Oracle reading focuses on three critical areas of life, aligned in a 3-row grid: <strong>Vitality, Prosperity, and Destiny.</strong></p>
+            <p class="mb-4">The entire Oracle reading focuses on three critical areas of life, aligned in a 3-row grid: **Vitality, Prosperity, and Destiny.**</p>
 
             <h4 class="font-semibold text-yellow-300 mt-4">Step 1: Focus and Breathe</h4>
-            <p class="italic text-gray-400">Breathe Tesla-style: Inhale for 3 counts, hold for 6 counts, and exhale for 9 counts. This establishes the digital root loop ($3+6+9 = 18 → 9$) of completion.</p>
+            <p class="italic text-gray-400">Breathe Tesla-style: Inhale for 3 counts, hold for 6 counts, and exhale for 9 counts. This establishes the digital root loop ($3+6+9 = 18 \rightarrow 9$) of completion.</p>
 
             <h4 class="font-semibold text-yellow-300 mt-4">The 6 Glyphs of Resonance</h4>
             <ul class="list-disc list-inside space-y-1 mt-2 ml-4 text-gray-300">
-                <li>▣ <strong>Square:</strong> Balance, Foundation, Stability</li>
-                <li>◎ <strong>Spiral:</strong> Emission, Momentum, Creative Force</li>
-                <li>▲ <strong>Triangle:</strong> Structure, Creation, Legacy</li>
-                <li>≋ <strong>Wave:</strong> Flow, Adaptability, Change</li>
-                <li>★ <strong>Star:</strong> Prime, Potential, Insight</li>
-                <li>👑 <strong>Crown:</strong> Completion, Apex, Fulfillment</li>
+                <li>▣ **Square:** Balance, Foundation, Stability</li>
+                <li>◎ **Spiral:** Emission, Momentum, Creative Force</li>
+                <li>▲ **Triangle:** Structure, Creation, Legacy</li>
+                <li>≋ **Wave:** Flow, Adaptability, Change</li>
+                <li>★ **Star:** Prime, Potential, Insight</li>
+                <li>👑 **Crown:** Completion, Apex, Fulfillment</li>
             </ul>
         </div>
     </div>
 
     <script>
-        // ==================== FINAL FIXED CONFIGURATION (VERCEL READY) ====================
-        const grokApiUrl = "/api/grok";  // ← This is the only line you needed to change!
-
+        // ==================== FIXED CONFIGURATION ====================
+        // Removed Grok API Key and URL constants
+        
         window.showScreen = (screenId, previousScreenId) => {
-            if (speechSynthesis.speaking) speechSynthesis.cancel();
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
             document.querySelectorAll('.screen').forEach(s => s.hidden = true);
             document.getElementById(screenId).hidden = false;
             if (screenId === 'grid-screen') renderGrid();
         };
 
-        const ORIGINAL_ANALYSIS_TEXT = 'Get Deep Dive Directive';
-        const CLOSE_ANALYSIS_TEXT = 'Close Deep Dive';
-        const PLAY_AUDIO_TEXT = 'Read Transmission Aloud';
-        const STOP_AUDIO_TEXT = 'Stop Audio';
+        const PLAY_AUDIO_TEXT = '🔊 Read Transmission Aloud';
+        const STOP_AUDIO_TEXT = '⏹ Stop Audio';
 
         window.currentSymbols = {
             v1: 'Star', v2: 'Square', v3: 'Spiral',
             p1: 'Wave', p2: 'Star', p3: 'Crown',
             d1: 'Triangle', d2: 'Wave', d3: 'Square'
         };
-        window.currentReadingData = { rawTextForTTS: "", contextForGrok: "" }; 
+        window.currentReadingData = {
+            rawTextForTTS: ""
+            // Removed contextForGrok
+        }; 
 
         const symbols = ['Square', 'Spiral', 'Triangle', 'Wave', 'Star', 'Crown'];
         const symbolDisplay = {
@@ -158,44 +162,46 @@
         };
         const getRandomSymbol = () => symbols[Math.floor(Math.random() * symbols.length)];
 
+        // Removed saveKey function
+        // Removed showKeyBox/hideKeyBox functions
+
         function showModal(title, message) {
+            const modal = document.getElementById('custom-modal');
+            if (!modal) return;
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
-            document.getElementById('custom-modal').classList.remove('hidden');
+            modal.classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('custom-modal').classList.add('hidden');
         }
 
-        function setLoading(elementId, isLoading, defaultText = '', spinnerClass = 'text-yellow-400') {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            if (isLoading) {
-                el.innerHTML = `<div class="flex items-center justify-center space-x-2">
-                    <svg class="animate-spin h-5 w-5 ${spinnerClass}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Transmitting...</span>
-                </div>`;
-                el.disabled = true;
-            } else {
-                el.innerHTML = defaultText;
-                el.disabled = false;
-            }
-        }
-
+        // Removed setLoading function as it was only used by Grok analysis
+        
         function renderDiceSlot(id) {
-            const s = window.currentSymbols[id];
-            const d = symbolDisplay[s];
-            return `<div id="${id}" class="dice-slot flex justify-center items-center w-full aspect-square bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-5xl sm:text-7xl font-extrabold ${d.color}">${d.char}</div>`;
+            const symbolKey = window.currentSymbols[id];
+            const display = symbolDisplay[symbolKey];
+
+            return `
+                <div 
+                    id="${id}"
+                    class="dice-slot flex justify-center items-center w-full aspect-square bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-5xl sm:text-7xl font-extrabold ${display.color}"
+                >
+                    ${display.char}
+                </div>
+            `;
         }
 
         function renderRowGroup(rowPrefix, label) {
             return `
-                <div class="flex items-center justify-center mx-auto my-4 w-full max-w-sm p-4 rounded-xl border border-gray-700 bg-gray-900/50 shadow-2xl">
-                    <button class="text-yellow-400 text-4xl cursor-pointer mr-4 hover:text-yellow-300 transition-colors" onclick="spinRow('${rowPrefix}')">△</button>
+                <div key="${rowPrefix}" class="flex items-center justify-center mx-auto my-4 w-full max-w-sm p-4 rounded-xl border border-gray-700 bg-gray-900/50 shadow-2xl">
+                    <button 
+                        class="text-yellow-400 text-4xl cursor-pointer mr-4 hover:text-yellow-300 transition-colors"
+                        onclick="spinRow('${rowPrefix}')"
+                    >
+                        △
+                    </button>
                     <div class="flex-grow">
                         <div class="text-left text-sm text-gray-400 mb-2 font-semibold">${label}</div>
                         <div class="grid grid-cols-3 gap-3">
@@ -204,13 +210,16 @@
                             ${renderDiceSlot(rowPrefix + '3')}
                         </div>
                     </div>
-                </div>`;
+                </div>
+            `;
         }
 
         function renderGrid() {
-            const container = document.getElementById('grid-container');
-            if (!container.innerHTML) {
-                container.innerHTML = [
+            const gridContainer = document.getElementById('grid-container');
+            if (!gridContainer) return;
+
+            if (!gridContainer.innerHTML || gridContainer.children.length === 0) {
+                gridContainer.innerHTML = [
                     renderRowGroup('v', '1. Vitality (Body, Intuition, Health)'),
                     renderRowGroup('p', '2. Prosperity (Abundance, Resources, Action)'),
                     renderRowGroup('d', '3. Destiny (Path, Potential, Highest Self)')
@@ -219,170 +228,173 @@
                 Object.keys(window.currentSymbols).forEach(id => {
                     const el = document.getElementById(id);
                     if (el) {
-                        const d = symbolDisplay[window.currentSymbols[id]];
-                        el.textContent = d.char;
-                        el.className = `dice-slot flex justify-center items-center w-full aspect-square bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-5xl sm:text-7xl font-extrabold ${d.color}`;
+                        const symbolKey = window.currentSymbols[id];
+                        const display = symbolDisplay[symbolKey];
+                        el.textContent = display.char;
+                        el.className = `dice-slot flex justify-center items-center w-full aspect-square bg-gray-800 rounded-xl shadow-lg border border-gray-700 text-5xl sm:text-7xl font-extrabold ${display.color}`;
                     }
                 });
             }
         }
 
-        window.spinRow = (prefix) => {
-            const ids = [`${prefix}1`, `${prefix}2`, `${prefix}3`];
-            const spinInt = setInterval(() => {
-                ids.forEach(id => window.currentSymbols[id] = getRandomSymbol());
+        window.spinRow = (rowPrefix) => {
+            const ids = [`${rowPrefix}1`, `${rowPrefix}2`, `${rowPrefix}3`];
+            const spinDuration = 1500; 
+
+            const spinInterval = setInterval(() => {
+                ids.forEach(id => {
+                    window.currentSymbols[id] = getRandomSymbol();
+                });
                 renderGrid();
             }, 100);
+
             setTimeout(() => {
-                clearInterval(spinInt);
-                ids.forEach((id, i) => setTimeout(() => {
-                    window.currentSymbols[id] = getRandomSymbol();
-                    renderGrid();
-                }, i * 200));
-            }, 1500);
-        };
+                clearInterval(spinInterval);
+                
+                ids.forEach((id, index) => {
+                    setTimeout(() => {
+                        window.currentSymbols[id] = getRandomSymbol();
+                        renderGrid();
+                    }, index * 200); 
+                });
+
+            }, spinDuration);
+        }
 
         function calculateReading(c1, c2, c3, rowName) {
-            const arr = [c1, c2, c3];
-            const uniq = new Set(arr);
-            const sum = arr.reduce((a, s) => a + symbolDisplay[s].value, 0);
-            let resonance = uniq.size === 1 ? `Triple ${c1.toUpperCase()} Manifestation` :
-                           uniq.size === 3 ? "Synergistic Flux" : "Paired Polarity";
-            let summary = "";
+            const symbolsArr = [c1, c2, c3];
+            const uniqueSymbols = new Set(symbolsArr);
+            const sum = symbolsArr.reduce((acc, symbol) => acc + symbolDisplay[symbol].value, 0);
 
+            let resonance = "";
+            let summary = "";
+            const isTriple = uniqueSymbols.size === 1;
+            const keyMeanings = symbolsArr.map(s => symbolDisplay[s].value === 6 ? 'Fulfillment' : s).join(', ');
+
+            if (isTriple) {
+                resonance = `Triple ${c1.toUpperCase()} Manifestation`;
+            } else if (uniqueSymbols.size === 3) {
+                resonance = "Synergistic Flux";
+            } else if (uniqueSymbols.size === 2) {
+                resonance = "Paired Polarity";
+            }
+            
             if (rowName === 'Vitality') {
-                summary = `Your **Intuitive Current** flows through *${arr.join(', ')}*. Align body and mind in adaptive, energized flow.`;
-                if (uniq.size === 1) {
-                    if (c1 === 'Square') summary = "▣▣▣ **Static Charge:** Break a routine to release blocked energy.";
-                    if (c1 === 'Spiral') summary = "◎◎◎ **Emission Overload:** One breathing ritual (3-6-9) to focus raw power.";
-                    if (c1 === 'Wave') summary = "≋≋≋ **Tsunami of Adaptation:** Surrender everything. Total transformation is here.";
-                }
+                summary = `Your **Intuitive Current** is channeled through a dynamic of *${keyMeanings}*. This is a call to align mind and body, finding health not in rigidity, but in **adaptive, energized flow**.`;
+                
+                if (isTriple && c1 === 'Square') summary = "▣▣▣ **Static Charge:** Intuitive self-containment. You must consciously **break a routine** (e.g., skip the gym, walk a new route) to release blocked energy. Rest is not idleness, but potent recharging.";
+                if (isTriple && c1 === 'Spiral') summary = "◎◎◎ **Emission Overload:** Your mind is buzzing with too many inputs. Focus on a single breathing ritual (In 3, Hold 6, Out 9) to condense this raw creative energy into a useful, stable output.";
+                if (isTriple && c1 === 'Wave') summary = "≋≋≋ **Tsunami of Adaptation:** Your body is asking for extreme flow and surrender. Resist nothing, embrace total change in diet, schedule, or habits. Rapid transformation is possible.";
             } else if (rowName === 'Prosperity') {
-                summary = `Your **Resource Stream** activates via *${arr.join(', ')}*. Structure + action = abundance.`;
-                if (uniq.size === 1) {
-                    if (c1 === 'Square') summary = "▣▣▣ **Financial Fortress:** Safe, slow, guaranteed growth. Avoid risk.";
-                    if (c1 === 'Spiral') summary = "◎◎◎ **Vortex of Expansion:** Anchor the flow now or lose it.";
-                    if (c1 === 'Crown') summary = "👑👑👑 **Ultimate Wealth:** Unexpected reward from past goodwill incoming.";
-                }
+                summary = `Your **Resource Stream** is activated by *${keyMeanings}*. Abundance will be generated through **structured action and disciplined emission**. Your actions must reflect your internal alignment.`;
+
+                if (isTriple && c1 === 'Square') summary = "▣▣▣ **Financial Fortress:** Your resources are locked down and secure. Growth will be slow but guaranteed through stable, traditional investments. **Avoid risk now.**";
+                if (isTriple && c1 === 'Spiral') summary = "◎◎◎ **Vortex of Expansion:** Resources are multiplying rapidly, but you lack focus. Deploy **structural planning** (Square or Triangle) immediately to anchor the flow and prevent dissipation.";
+                if (isTriple && c1 === 'Crown') summary = "👑👑👑 **Ultimate Wealth:** You have reached the digital root of abundance. A major financial cycle is completing. **Look for an unexpected reward** tied to past goodwill or a long-term investment.";
             } else if (rowName === 'Destiny') {
-                summary = `Your **Path Alignment** is shaped by *${arr.join(', ')}*. Synthesize structure and flow.`;
-                if (uniq.size === 1) {
-                    if (c1 === 'Triangle') summary = "▲▲▲ **Pure Blueprint:** Do not deviate. Execute perfectly.";
-                    if (c1 === 'Wave') summary = "≋≋≋ **Uncharted Current:** Be the pioneer. Zero fixed plans.";
-                    if (c1 === 'Star') summary = "★★★ **Prime Alignment:** You are on purpose. Watch for 3 synchronicities.";
-                }
+                summary = `Your **Path Alignment** is defined by *${keyMeanings}*. This is the nature of your highest potential. The journey requires synthesizing **Structure and Flow** to reach Prime potential.`;
+
+                if (isTriple && c1 === 'Triangle') summary = "▲▲▲ **Pure Blueprint:** Your destiny is rigid and pre-determined by your commitments. Do not deviate. Focus on perfect execution of your current long-term plan.";
+                if (isTriple && c1 === 'Wave') summary = "≋≋≋ **Uncharted Current:** The path ahead is fully unknown. This is an invitation to be a pioneer; success comes from radical flexibility. **Commit to zero fixed plans.**";
+                if (isTriple && c1 === 'Star') summary = "★★★ **Prime Alignment:** You are currently living your highest purpose. Every step is guided. Look for **three synchronicities** today as confirmation.";
             }
 
             return { resonance, summary, sum, c1, c2, c3 };
         }
 
         window.generatePrediction = () => {
-            const { v1,v2,v3,p1,p2,p3,d1,d2,d3 } = window.currentSymbols;
-            const vitality = calculateReading(v1,v2,v3,'Vitality');
-            const prosperity = calculateReading(p1,p2,p3,'Prosperity');
-            const destiny = calculateReading(d1,d2,d3,'Destiny');
-            const totalSum = vitality.sum + prosperity.sum + destiny.sum;
-            const teslaMod = totalSum % 9 || 9;
+            const { v1, v2, v3, p1, p2, p3, d1, d2, d3 } = window.currentSymbols;
 
-            let finalTheme = "", finalInt = "";
-            if (teslaMod === 3) { finalTheme = "The Principle of **CREATION** (3)"; finalInt = "You are the spark. Build now."; }
-            else if (teslaMod === 6) { finalTheme = "The Principle of **RESONANCE** (6)"; finalInt = "Amplify harmony in all relations."; }
-            else if (teslaMod === 9) { finalTheme = "The Principle of **HARMONY** (9)"; finalInt = "Mastery achieved. Walk in quiet power."; }
-            else { finalTheme = `The Principle of **FLUX** (${teslaMod})`; finalInt = "Adapt swiftly. Growth through change."; }
+            const vitalityReading = calculateReading(v1, v2, v3, 'Vitality');
+            const prosperityReading = calculateReading(p1, p2, p3, 'Prosperity');
+            const destinyReading = calculateReading(d1, d2, d3, 'Destiny');
 
-            const format = t => t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            const totalSum = vitalityReading.sum + prosperityReading.sum + destinyReading.sum;
+            const teslaMod = totalSum % 9; 
+            
+            let finalTheme = "";
+            let finalInterpretation = "";
 
-            const html = `
-                <div class="p-6 w-full">
+            if (teslaMod === 3) {
+                finalTheme = "The Principle of **CREATION** (3)";
+                finalInterpretation = "The energy of the Coil calls for immediate construction. Focus your combined Vitality, Prosperity, and Destiny towards initiating a new phase, project, or relationship. This is the time to generate, not merely maintain. **You are the spark.**";
+            } else if (teslaMod === 6) {
+                finalTheme = "The Principle of **RESONANCE** (6)";
+                finalInterpretation = "Your current path is vibrating with the universal frequency. Review your external relationships and internal environments; harmony is the key. Seek alignment between your actions and your highest values to amplify your potential. **Amplify the good.**";
+            } else if (teslaMod === 0 || teslaMod === 9) {
+                finalTheme = "The Principle of **HARMONY** (9)";
+                finalInterpretation = "This result signifies a cycle of completion and mastery. All three forces—Body, Resource, and Path—are in perfect balance. You have the necessary foundation and flow to achieve a significant, long-term goal. Move with quiet confidence. **Enjoy the mastery.**";
+            } else {
+                finalTheme = `The Principle of **FLUX** (Modulus: ${teslaMod})`;
+                finalInterpretation = "Your current state is dynamic and requires focused energy management. The total resonance does not fall into the primary 3-6-9 loop, indicating a period of high change and rapid learning. Focus on synthesizing your three forces to achieve stability. **Adapt to grow.**";
+            }
+
+            const formatSummary = (summary) => {
+                return summary
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+            };
+
+            const readingComponents = [
+                { title: 'VITALITY (Body, Health, Intuition)', data: vitalityReading },
+                { title: 'PROSPERITY (Abundance, Resources, Action)', data: prosperityReading },
+                { title: 'DESTINY (Path, Potential, Highest Self)', data: destinyReading },
+            ];
+
+            const outputHTML = `
+                <div class="p-4 sm:p-6 w-full">
+                    <p class="text-xl text-center font-bold text-gray-400 mb-2">THE FULL ORACLE TRANSMISSION</p>
                     <p class="text-center text-3xl font-extrabold text-teal-400 mb-6">${finalTheme}</p>
-                    <p class="text-center text-gray-200 mb-8">${format(finalInt)}</p>
+                    
+                    <h3 class="text-xl font-bold text-yellow-400 border-b border-yellow-800 pb-1 mt-6 mb-3">THE HARMONIC LAW</h3>
+                    <p class="mb-4 text-gray-200">${formatSummary(finalInterpretation)}</p>
 
-                    ${['Vitality', 'Prosperity', 'Destiny'].map((area, i) => {
-                        const r = [vitality, prosperity, destiny][i];
-                        return `<div class="mb-8">
-                            <h3 class="text-xl font-bold text-yellow-400 border-b border-yellow-800 pb-1 mb-3">
-                                ${i===0?'VITALITY':i===1?'PROSPERITY':'DESTINY'}
-                            </h3>
-                            <p class="font-semibold text-teal-300">Resonance: ${r.resonance}</p>
-                            <p class="text-gray-200">${format(r.summary)}</p>
-                        </div>`;
-                    }).join('')}
+                    ${readingComponents.map((item, index) => `
+                        <div key=${index} class="mb-6">
+                            <h3 class="text-xl font-bold text-yellow-400 border-b border-yellow-800 pb-1 mt-6 mb-3">${item.title}</h3>
+                            <p class="font-semibold text-lg text-teal-300">Resonance: ${item.data.resonance}</p>
+                            <p class="text-gray-200">${formatSummary(item.data.summary)}</p>
+                            <p class="text-xs text-gray-500 mt-2">Trigram: ${item.data.c1}-${item.data.c2}-${item.data.c3} (Sum: ${item.data.sum})</p>
+                        </div>
+                    `).join('')}
 
-                    <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                        <button id="analysis-button" class="bg-purple-600 hover:bg-purple-700 text-white font-extrabold py-3 px-8 rounded-xl shadow-xl"
-                            onclick="getGrokAnalysis(window.currentReadingData.contextForGrok)">
-                            ${ORIGINAL_ANALYSIS_TEXT}
-                        </button>
-                        <button id="audio-button" class="bg-teal-600 hover:bg-teal-700 text-white font-extrabold py-3 px-8 rounded-xl shadow-xl"
-                            onclick="generateAndPlayAudio()">
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button 
+                            id="audio-button"
+                            class="bg-teal-600 hover:bg-teal-700 text-white font-extrabold py-3 px-8 rounded-xl shadow-xl transition-colors active:scale-95"
+                            onclick="generateAndPlayAudio()"
+                        >
                             ${PLAY_AUDIO_TEXT}
                         </button>
                     </div>
-                    <div id="analysis-output"></div>
-                </div>`;
+                    <div id="analysis-output" class="mt-4">
+                        </div>
+                </div>
+            `;
+            
+            const stripHtml = (text) => text.replace(/<\/?(strong|em)>/g, '');
 
-            const context = `Theme: ${finalTheme} | Mod: ${teslaMod} | V: ${v1}-${v2}-${v3} | P: ${p1}-${p2}-${p3} | D: ${d1}-${d2}-${d3}`;
+            const rawTextForTTS = [
+                stripHtml(finalTheme),
+                stripHtml(finalInterpretation),
+                `Vitality Resonance: ${vitalityReading.resonance}. Summary: ${stripHtml(vitalityReading.summary)}`,
+                `Prosperity Resonance: ${prosperityReading.resonance}. Summary: ${stripHtml(prosperityReading.summary)}`,
+                `Destiny Resonance: ${destinyReading.resonance}. Summary: ${stripHtml(destinyReading.summary)}`
+            ].join('. ');
+
             window.currentReadingData = {
-                rawTextForTTS: `${finalTheme}. ${finalInt}. Vitality: ${vitality.summary}. Prosperity: ${prosperity.summary}. Destiny: ${destiny.summary}`,
-                contextForGrok: context
+                rawTextForTTS: rawTextForTTS,
+                // Removed contextForGrok
             };
 
-            document.getElementById('prediction-output').innerHTML = html;
+            document.getElementById('prediction-output').innerHTML = outputHTML;
             showScreen('prediction-screen', 'grid-screen');
-        };
+        }
 
-        // ==================== GROK ANALYSIS — NOW 100% VERCEL SAFE ====================
-        window.getGrokAnalysis = async (readingContext) => {
-            const output = document.getElementById('analysis-output');
-            const btn = document.getElementById('analysis-button');
-            
-            if (output.innerHTML.trim()) {
-                output.innerHTML = '';
-                btn.innerHTML = ORIGINAL_ANALYSIS_TEXT;
-                return;
-            }
-
-            setLoading('analysis-button', true, ORIGINAL_ANALYSIS_TEXT);
-
-            const system = "You are the Tesla Oracle's AI Conduit, powered by Grok. Synthesize the reading into one powerful, actionable directive/mantra blending 3-6-9 themes with real steps. Inspiring, visionary, esoteric tone. Start with 'Directive: '";
-            const user = `Reading: ${readingContext}. Generate the Directive.`;
-
-            try {
-                const res = await fetch(grokApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: "grok-beta",
-                        messages: [
-                            { role: "system", content: system },
-                            { role: "user", content: user }
-                        ],
-                        temperature: 0.8
-                    })
-                });
-
-                setLoading('analysis-button', false);
-
-                if (res.ok) {
-                    const data = await res.json();
-                    const text = data.choices?.[0]?.message?.content || "The coil is silent...";
-                    output.innerHTML = `
-                        <div class="p-6 mt-8 bg-gray-900 border-2 border-purple-500 rounded-xl shadow-inner">
-                            <p class="text-lg text-purple-400 font-bold mb-3">GROK CONDUIT TRANSMISSION</p>
-                            <p class="text-gray-100 whitespace-pre-wrap leading-relaxed">${text}</p>
-                        </div>`;
-                    btn.innerHTML = CLOSE_ANALYSIS_TEXT;
-                } else {
-                    const err = await res.json();
-                    showModal("Error", err.error?.message || "Transmission failed");
-                }
-            } catch (e) {
-                setLoading('analysis-button', false);
-                showModal("Network Error", "Check connection or server logs");
-            }
-        };
-
-        window.generateAndPlayAudio = () => {
+        // Removed getGrokAnalysis function
+        
+        // ==================== FIXED TTS ====================
+         window.generateAndPlayAudio = () => {
             if (speechSynthesis.speaking) {
                 speechSynthesis.cancel();
                 document.getElementById('audio-button').innerHTML = PLAY_AUDIO_TEXT;
@@ -396,10 +408,13 @@
             speechSynthesis.speak(utter);
         };
 
-        document.addEventListener('DOMContentLoaded', renderGrid);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGrid();
+        });
     </script>
 </body>
 </html>
+
 
 
 
